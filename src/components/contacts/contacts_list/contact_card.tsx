@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 interface IContactCardProps {
   contactItem: IContact;
   setContacts: (contacts: IContact[]) => void;
+  setEditContact: (contact: IContact) => void;
   contacts: IContact[];
 }
 
@@ -12,6 +13,7 @@ export default function ContactCard({
   contactItem,
   setContacts,
   contacts,
+  setEditContact,
 }: IContactCardProps) {
   async function handleDelete() {
     const isConfirmed = window.confirm(
@@ -23,7 +25,7 @@ export default function ContactCard({
     }
 
     try {
-      const response = await deleteContact(contactItem.id.toString());
+      const response = await deleteContact(contactItem.id?.toString() || "");
       console.log(response);
       if (response.status === 200) {
         setContacts(
@@ -37,6 +39,10 @@ export default function ContactCard({
       console.error(error);
       toast.error("Error deleting contact" + error);
     }
+  }
+
+  function handleEdit() {
+    setEditContact(contactItem);
   }
 
   return (
@@ -64,7 +70,7 @@ export default function ContactCard({
         <div className="flex justify-end">
           <button
             className="text-white bg-blue-500 px-2 py-1 self-center rounded-r"
-            onClick={() => {}}
+            onClick={handleEdit}
           >
             ویرایش
           </button>

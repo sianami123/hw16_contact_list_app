@@ -4,5 +4,5 @@ export interface IContact {
   phoneNumber: string;
   relative: string;
   email: string;
-  id: number;
+  id?: string;
 }

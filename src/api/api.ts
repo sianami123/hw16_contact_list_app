@@ -77,14 +77,14 @@ async function updateContact(
   relative?: string,
   email?: string
 ) {
-  const response = await api.put(API_ROUTES.UPDATE_CONTACT, {
-    id,
+  const response = await api.put(`${API_ROUTES.UPDATE_CONTACT}/${id}`, {
     fName,
     lName,
     phoneNumber,
     relative,
     email,
   });
+
   return response;
 }
 

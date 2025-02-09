@@ -8,9 +8,7 @@ import { IContact } from "../../types/types";
 
 export default function Contacts() {
   const [contacts, setContacts] = useState<IContact[]>([]);
-
   const [editContact, setEditContact] = useState<IContact | null>(null);
-  const [deleteContact, setDeleteContact] = useState<IContact | null>(null);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -23,7 +21,7 @@ export default function Contacts() {
           alert("Error fetching contacts:" + response.data.message);
         }
       } catch (error) {
-        toast.error("Error fetching contacts:" + error, {
+        toast.error(`Error fetching contacts: ${error}`, {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -40,8 +38,17 @@ export default function Contacts() {
       <div></div>
       <Header />
       <div className="flex gap-1 mt-2 mx-3 flex-col sm:flex-col sm:gap-3 md:flex-row">
-        <AddContact setContacts={setContacts} contacts={contacts} />
-        <ContactsList contacts={contacts} setContacts={setContacts} />
+        <AddContact
+          setContacts={setContacts}
+          contacts={contacts}
+          editContact={editContact}
+          setEditContact={setEditContact}
+        />
+        <ContactsList
+          contacts={contacts}
+          setContacts={setContacts}
+          setEditContact={setEditContact}
+        />
       </div>
     </div>
   );

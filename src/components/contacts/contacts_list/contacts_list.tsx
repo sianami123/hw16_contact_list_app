@@ -4,11 +4,13 @@ import { IContact } from "../../../types/types";
 interface IContactsListProps {
   contacts: IContact[];
   setContacts: (contacts: IContact[]) => void;
+  setEditContact: (contact: IContact) => void;
 }
 
 export default function ContactsList({
   contacts,
   setContacts,
+  setEditContact,
 }: IContactsListProps) {
   return (
     <div className="lg:w-2/3 sm:w-full flex flex-col gap-2">
@@ -20,6 +22,7 @@ export default function ContactsList({
             key={contact.id}
             contactItem={contact}
             setContacts={setContacts}
+            setEditContact={setEditContact}
             contacts={contacts}
           />
         ))}

@@ -1,26 +1,41 @@
 import TextInput from "./text_input";
-import { useState } from "react";
-import { createContact } from "../../../api/api";
+import { useState, useEffect } from "react";
+import { createContact, updateContact } from "../../../api/api";
 import { toast } from "react-toastify";
 import { IContact } from "../../../types/types";
 
 interface IAddContactProps {
   setContacts: (contacts: IContact[]) => void;
   contacts: IContact[];
+  editContact: IContact | null;
+  setEditContact: (contact: IContact | null) => void;
 }
 
 export default function AddContact({
   setContacts,
   contacts,
+  editContact,
+  setEditContact,
 }: IAddContactProps) {
-  const [name, setName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [relation, setRelation] = useState("");
+  const [name, setName] = useState(editContact?.fName || "");
+  const [lastName, setLastName] = useState(editContact?.lName || "");
+  const [phone, setPhone] = useState(editContact?.phoneNumber || "");
+  const [email, setEmail] = useState(editContact?.email || "");
+  const [relation, setRelation] = useState(editContact?.relative || "");
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // TODO: why after editing the contact, the email is not updated in usestate?
+  useEffect(() => {
+    if (editContact) {
+      setName(editContact.fName || "");
+      setLastName(editContact.lName || "");
+      setPhone(editContact.phoneNumber || "");
+      setEmail(editContact.email || "");
+      setRelation(editContact.relative || "");
+    }
+  }, [editContact]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -77,6 +92,41 @@ export default function AddContact({
     }
   }
 
+  async function handleEdit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    console.log(editContact?.id, name, lastName, phone, relation, email);
+
+    setIsLoading(true);
+    updateContact(
+      editContact?.id || "",
+      name,
+      lastName,
+      phone,
+      relation,
+      email
+    ).then((response) => {
+      if (response.status === 200 || response.status === 201) {
+        toast.success(`Contact ${name} ${lastName} updated successfully`);
+        setContacts(
+          contacts.map((contact) =>
+            contact.id === editContact?.id ? response.data : contact
+          )
+        );
+        setName("");
+        setLastName("");
+        setPhone("");
+        setRelation("");
+        setEmail("");
+        setEditContact(null);
+        setIsLoading(false);
+      } else {
+        toast.error("Error updating contact");
+      }
+      setIsLoading(false);
+    });
+  }
+
   return (
     <div className="lg:w-1/4 sm:w-full  flex flex-col gap-3">
       <h2 className="flex justify-center font-bold text-xl">
@@ -84,7 +134,7 @@ export default function AddContact({
       </h2>
       <form
         className="shadow-md p-3 flex flex-col gap-4"
-        onSubmit={handleSubmit}
+        onSubmit={editContact ? handleEdit : handleSubmit}
       >
         <TextInput
           label="نام:"
@@ -132,7 +182,9 @@ export default function AddContact({
             className="bg-blue-500 cursor-pointer disabled:bg-gray-500 text-white rounded px-2 py-2 hover:bg-blue-600 sm:w-full md:w-fit"
             disabled={isLoading}
           >
-            {isLoading ? "در حال اضافه کردن..." : "اضافه کردن"}
+            {!isLoading && (editContact ? "ویرایش" : "اضافه کردن")}
+            {isLoading &&
+              (editContact ? "درحال ویرایش" : "در حال اضافه کردن...")}
           </button>
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </div>
