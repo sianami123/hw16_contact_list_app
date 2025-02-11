@@ -39,30 +39,7 @@ export default function AddContact({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (
-      name === "" ||
-      lastName === "" ||
-      phone === "" ||
-      relation === "" ||
-      email === ""
-    ) {
-      setErrorMessage("لطفا تمامی فیلدها را پر کنید");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage("ایمیل معتبر نیست");
-      return;
-    }
-    if (!/^[0-9]+$/.test(phone)) {
-      setErrorMessage("شماره موبایل معتبر نیست");
-      return;
-    }
-    if (contacts.some((contact) => contact.phoneNumber === phone)) {
-      setErrorMessage("این شماره موبایل قبلا ثبت شده است");
-      return;
-    }
-    if (contacts.some((contact) => contact.email === email)) {
-      setErrorMessage("این ایمیل قبلا ثبت شده است");
+    if (!validateFormData()) {
       return;
     }
     setErrorMessage("");
@@ -78,7 +55,7 @@ export default function AddContact({
       console.log(response);
 
       if (response.status === 200 || response.status === 201) {
-        toast.success(`Contact ${name} ${lastName} created successfully`);
+        toast.success(`${name} ${lastName} با موفقیت اضافه شد`);
         setContacts([...contacts, response.data]);
         setName("");
         setLastName("");
@@ -96,9 +73,7 @@ export default function AddContact({
     }
   }
 
-  async function handleEdit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    console.log(editContact?.id, name, lastName, phone, relation, email);
+  function validateFormData() {
     if (
       name === "" ||
       lastName === "" ||
@@ -107,22 +82,40 @@ export default function AddContact({
       email === ""
     ) {
       setErrorMessage("لطفا تمامی فیلدها را پر کنید");
-      return;
+      return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setErrorMessage("ایمیل معتبر نیست");
-      return;
+      return false;
     }
-    if (!/^[0-9]+$/.test(phone)) {
-      setErrorMessage("شماره موبایل معتبر نیست");
-      return;
-    }
-    if (contacts.some((contact) => contact.phoneNumber === phone)) {
+    // if (!/^[0-9]+$/.test(phone)) {
+    //   setErrorMessage("شماره موبایل معتبر نیست");
+    //   return false;
+    // }
+    if (
+      contacts.some(
+        (contact) =>
+          contact.phoneNumber === phone && contact.id !== editContact?.id
+      )
+    ) {
       setErrorMessage("این شماره موبایل قبلا ثبت شده است");
-      return;
+      return false;
     }
-    if (contacts.some((contact) => contact.email === email)) {
+    if (
+      contacts.some(
+        (contact) => contact.email === email && contact.id !== editContact?.id
+      )
+    ) {
       setErrorMessage("این ایمیل قبلا ثبت شده است");
+      return false;
+    }
+    return true;
+  }
+
+  async function handleEdit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    console.log(editContact?.id, name, lastName, phone, relation, email);
+    if (!validateFormData()) {
       return;
     }
     setErrorMessage("");
@@ -137,7 +130,7 @@ export default function AddContact({
       email
     ).then((response) => {
       if (response.status === 200 || response.status === 201) {
-        toast.success(`Contact ${name} ${lastName} updated successfully`);
+        toast.success(`${name} ${lastName} با موفقیت ویرایش شد`);
         setContacts(
           contacts.map((contact) =>
             contact.id === editContact?.id ? response.data : contact
