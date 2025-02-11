@@ -53,6 +53,10 @@ export default function AddContact({
       setErrorMessage("ایمیل معتبر نیست");
       return;
     }
+    if (!/^[0-9]+$/.test(phone)) {
+      setErrorMessage("شماره موبایل معتبر نیست");
+      return;
+    }
     if (contacts.some((contact) => contact.phoneNumber === phone)) {
       setErrorMessage("این شماره موبایل قبلا ثبت شده است");
       return;
@@ -94,8 +98,34 @@ export default function AddContact({
 
   async function handleEdit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     console.log(editContact?.id, name, lastName, phone, relation, email);
+    if (
+      name === "" ||
+      lastName === "" ||
+      phone === "" ||
+      relation === "" ||
+      email === ""
+    ) {
+      setErrorMessage("لطفا تمامی فیلدها را پر کنید");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMessage("ایمیل معتبر نیست");
+      return;
+    }
+    if (!/^[0-9]+$/.test(phone)) {
+      setErrorMessage("شماره موبایل معتبر نیست");
+      return;
+    }
+    if (contacts.some((contact) => contact.phoneNumber === phone)) {
+      setErrorMessage("این شماره موبایل قبلا ثبت شده است");
+      return;
+    }
+    if (contacts.some((contact) => contact.email === email)) {
+      setErrorMessage("این ایمیل قبلا ثبت شده است");
+      return;
+    }
+    setErrorMessage("");
 
     setIsLoading(true);
     updateContact(

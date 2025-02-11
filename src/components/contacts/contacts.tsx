@@ -9,6 +9,7 @@ import { IContact } from "../../types/types";
 export default function Contacts() {
   const [contacts, setContacts] = useState<IContact[]>([]);
   const [editContact, setEditContact] = useState<IContact | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     const fetchContacts = async () => {
